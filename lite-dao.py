@@ -1,5 +1,5 @@
 Proposals = Hash(default_value = None)
-ProposalCount = Variable
+#ProposalCount = Variable
 Ballots = Hash(default_value = False)
 BallotCount = Hash(default_value = 0)
 ProposalCount = Variable()
@@ -19,7 +19,10 @@ def seed():
     metadata['token_contract'] = 'con_rswp_lst001'
     metadata['v_token_contracts'] = ['con_staking_rswp_rswp_interop_v2']
     metadata['lp_v_token_contracts'] = ['con_liq_mining_rswp_rswp']
-    metadata['dex_contract'] = 'con_rocketswap_official_v1_1'
+
+    #changed rocketswap contract name to dex for testing purpose
+    metadata['dex_contract'] = 'dex'
+    
     metadata['min_description_length'] = 10
     metadata['min_title_length'] = 10
 
@@ -60,8 +63,8 @@ def count_ballots(proposal_idx: int, batch_size: int = 100):
     assert Ballots[proposal_idx, "counted"] is not True, 'this ballot has been counted.'
     '''check if this proposal has a stored lp token weight, if no, calculate how much the LP weight is worth'''
     token_contract_name = metadata['token_contract']
-    if LPWeight[proposal_idx,token_contract] is 0:
-         set_lp_token_value(token_contract_name=token_contract_name)
+    if LPWeight[proposal_idx,token_contract_name] is 0:
+         set_lp_token_value(proposal_idx=proposal_idx, token_contract_name=token_contract_name)
     
     start_idx = ProcessedBallots[proposal_idx]
     counted_ballots = ProcessedBallots[proposal_idx]
@@ -72,11 +75,11 @@ def count_ballots(proposal_idx: int, batch_size: int = 100):
     for i in range(0, batch_size):        
         current_ballot_idx = start_idx + i
         
-        voter_vk = Ballots[proposal_idx,"forwards_index",ballot_idx,"user_vk"]
+        voter_vk = Ballots[proposal_idx,"forwards_index", current_ballot_idx,"user_vk"]
 
         ProcessedBallots[proposal_idx, current_ballot_idx, "choice"] = Ballots[proposal_idx,"forwards_index", current_ballot_idx, "choice"]
         ProcessedBallots[proposal_idx, current_ballot_idx, "user_vk"] = voter_vk
-        ProcessedBallots[proposal_idx, current_ballot_idx, "weight"] = get_vk_weight(vk=voter_vk)
+        ProcessedBallots[proposal_idx, current_ballot_idx, "weight"] = get_vk_weight(vk=voter_vk, proposal_idx=proposal_idx)
 
         if current_ballot_idx == BallotCount[proposal_idx]:
             # Mark ballot count as ready for verification.
@@ -144,7 +147,7 @@ def cast_ballot(proposal_idx: int, choice_idx: int):
     BallotCount[proposal_idx] += 1
 
 
-def get_vk_weight(vk:str, proposal_idx: str):
+def get_vk_weight(vk:str, proposal_idx: int):
     '''
     Get the rswp value of any tokens, vtokens and LP tokens for rswp pairs (staked or not). 
     '''
@@ -152,16 +155,16 @@ def get_vk_weight(vk:str, proposal_idx: str):
     user_token_total = 0
 
     user_token_total += get_token_value(vk=vk, token_contract_name=token_contract_name)
-    user_token_total += get_staked_token_value(vk=vk, token_contract_name=token_contract_name)
-    user_token_total += get_staked_lp_value(vk=vk, proposal_idx=proposal_idx)
-    user_token_total += get_lp_value(vk=vk, proposal_idx=proposal_idx)
+    user_token_total += get_staked_token_value(vk=vk)
+    user_token_total += get_staked_lp_value(vk=vk, proposal_idx=proposal_idx, token_contract_name=token_contract_name)
+    user_token_total += get_lp_value(vk=vk, proposal_idx=proposal_idx, token_contract_name=token_contract_name)
     user_token_total += get_rocketfuel_value(vk=vk, token_contract_name=token_contract_name)
 
     return user_token_total
 
 
 def get_token_value(vk:str, token_contract_name:str):
-    ForeignHash(foreign_contract=token_contract_name, foreign_name='balances')
+    token_contract = ForeignHash(foreign_contract=token_contract_name, foreign_name='balances')
     token_balance = token_contract["balances",vk] or 0
 
     return token_balance
@@ -178,7 +181,7 @@ def get_rocketfuel_value(vk:str, token_contract_name: str):
     return user_rocketfuel
 
 
-def get_lp_value(vk:str, token_contract_name: str):
+def get_lp_value(vk:str, proposal_idx:int, token_contract_name: str):
     '''
     get lp value from the dex contract
     '''
@@ -186,12 +189,12 @@ def get_lp_value(vk:str, token_contract_name: str):
     dex_lp_points = ForeignHash(foreign_contract=dex_contract_name, foreign_name='lp_points')
     user_lp = dex_lp_points[token_contract_name, vk] or 0
 
-    return user_lp * LPWeight[proposal_idx,token_contract]
+    return user_lp * LPWeight[proposal_idx,token_contract_name]
 
 
 def get_staked_lp_value(vk: str, proposal_idx: int, token_contract_name:str):
     lp_count = 0
-    staking_contract_names = LPmetadata['v_token_contracts']
+    staking_contract_names = metadata['v_token_contracts']
     lp_token_value = LPWeight[proposal_idx,token_contract_name]
 
     for contract in staking_contract_names:
@@ -199,7 +202,7 @@ def get_staked_lp_value(vk: str, proposal_idx: int, token_contract_name:str):
         vk_balance = balances[vk] or 0
         lp_count += vk_balance
 
-    return lp_count * LPWeight[proposal_idx,token_contract]
+    return lp_count * LPWeight[proposal_idx,token_contract_name]
 
 
 def get_staked_token_value(vk: str):
@@ -214,7 +217,7 @@ def get_staked_token_value(vk: str):
     return count
 
 
-def set_lp_token_value(token_contract_name: str):
+def set_lp_token_value(proposal_idx: int, token_contract_name: str):
     '''
     import the dex contract, get the reserves value for the TAU-RSWP pair, take the RSWP value of the LP and multiply it by 2
     '''
@@ -226,7 +229,7 @@ def set_lp_token_value(token_contract_name: str):
     total_lp = dex_lp_points[token_contract_name]
     token_per_lp = reserves[1] / total_lp
 
-    LPWeight[proposal_idx,token_contract] = token_per_lp * 2
+    LPWeight[proposal_idx,token_contract_name] = token_per_lp * 2
 
 
 def assert_operator():
