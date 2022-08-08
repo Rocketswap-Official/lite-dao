@@ -56,7 +56,9 @@ def deduct_fee():
     
 
 @export 
-def count_ballots(proposal_idx: int, batch_size: int = 100):
+def count_ballots(proposal_idx: int, batch_size: int = None):
+    if batch_size is None: batch_size=100
+
     '''checks'''
     assert now > Proposals[proposal_idx]["date_decision"], 'It is not possible to count the ballots for this proposal yet'
     assert Proposals[proposal_idx]["state"] is not "concluded", 'The ballots for this proposal have already been counted'
@@ -91,7 +93,9 @@ def count_ballots(proposal_idx: int, batch_size: int = 100):
 
 
 @export 
-def verify_ballots(proposal_idx: int, batch_size: int = 100):
+def verify_ballots(proposal_idx: int, batch_size: int = None):
+    if batch_size is None: batch_size=100
+
     '''checks'''
     assert Ballots[proposal_idx, "counted"] is True, 'ballots must be counted before verifying them'
     assert Ballots[proposal_idx, "verified"] is not True, 'the ballots for this proposal have already been verified'
@@ -107,7 +111,7 @@ def verify_ballots(proposal_idx: int, batch_size: int = 100):
         choice = Ballots[proposal_idx, current_ballot_idx, "choice"]
         processed_weight = Ballots[proposal_idx, current_ballot_idx, "weight"]
 
-        current_weight = get_vk_weight(vk=voter_vk)
+        current_weight = get_vk_weight(vk=voter_vk, proposal_idx=proposal_idx)
 
         if current_weight >= processed_weight - (processed_weight * 0.05):
             VerifiedBallots[proposal_idx, choice] += current_weight
