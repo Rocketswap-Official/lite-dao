@@ -67,15 +67,13 @@ class MyTestCase(unittest.TestCase):
         self.rswp.transfer(to="bob", amount=1000000)
         # self.rswp.transfer(to="bob", amount=1000000)
 
-        #approve dex to spend tokens
+        # approve dex to spend tokens
         self.currency.approve(signer="sys", amount=999999999, to="dex")
         self.rswp.approve(signer="sys", amount=999999999, to="dex")
 
-
-
     def tearDown(self):
         self.c.flush()
-    
+    '''
     def test_01_create_proposal_should_pass(self):
         start_env = {"now": Datetime(year=2021, month=2, day=1)}
         self.lite_dao.create_proposal(environment=start_env, signer="bob", title="hello world!", description="describe the world, before it's too late :(", date_decision=Datetime(year=2021, month=3, day=1, hour=1, minute=1), choices=['choice one is the choicest', 'choice two is the choosiest', 'choice three is for the thriceiest'])
@@ -163,12 +161,14 @@ class MyTestCase(unittest.TestCase):
         # print(self.lite_dao.Ballots[1,"forwards_index", 1, "user_vk"])
         # print(self.lite_dao.Ballots[1,"forwards_index", 2, "user_vk"])
         # print(self.lite_dao.BallotCount[1])
-    
+    '''
     def test_8_counting_ballots_should_pass(self):
         env_0 = {"now": Datetime(year=2021, month=2, day=1)}
         self.lite_dao.create_proposal(environment=env_0, signer="bob", title="hello world!", description="describe the world, before it's too late :(", date_decision=Datetime(year=2021, month=3, day=1, hour=1, minute=1), choices=['choice one is the choicest', 'choice two is the choosiest', 'choice three is for the thriceiest'])
 
         env_1 = {"now": Datetime(year=2021, month=2, day=2)}
+
+        #casting ballots 
         self.lite_dao.cast_ballot(environment=env_1, signer="bob", proposal_idx=1, choice_idx=0)
 
         self.lite_dao.cast_ballot(environment=env_1, signer="gifty", proposal_idx=1, choice_idx=2)
@@ -178,10 +178,12 @@ class MyTestCase(unittest.TestCase):
         self.lite_dao.cast_ballot(environment=env_1, signer="suz", proposal_idx=1, choice_idx=1)
 
         env_2 = {"now": Datetime(year=2021, month=3, day=2)}
-        self.lite_dao.count_ballots(environment=env_2, proposal_idx=1, batch_size=100)
+        self.lite_dao.count_ballots(environment=env_2, proposal_idx=1)
 
+        ballot_count = 4
         counted = True
 
+        self.assertEqual(self.lite_dao.BallotCount[1], ballot_count)
         self.assertEqual(self.lite_dao.Ballots[1, "counted"], counted)
         
         
