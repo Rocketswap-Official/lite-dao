@@ -14,11 +14,11 @@
 * When a ballot is cast, it is recorded in `Ballots[proposal_id]` along with a forwards_index and a backwards_index for looking up the ballot by user_vk and also by ballot_id. This is to prevent one vk casting multiple ballots.
 
 #### fn: count_ballots
-After `date_decision` no more ballots can be cast and `count_ballots` can be called. `count_ballots` iterates through all cast ballots, calculates the weight for each ballot and records the value in `CountedBallots`. `count_ballots` can be called until all ballots have been processed.
-
-Since the application counts the ballots in batches, there is a edge case where a savvy adversary could cause mischief and potentially vote with their coins more than once, by moving coins front one address to another in between batches. For this reason we have included in a verification step which assures that tokens which are used to vote cannot be used to vote a second time.
-
-Once `count_ballots` has been called for a proposal and has counted all the ballots `verify_ballots` can be called.
+* After `date_decision` no more ballots can be cast and `count_ballots` can be called. * `count_ballots` iterates through all cast ballots, calculates the weight for each ballot and records the value in `CountedBallots`. 
+* `count_ballots` can be called until all ballots have been processed.
+* Since the application counts the ballots in batches, there is a edge case where a savvy adversary could cause mischief and potentially vote with their coins more than once, by moving coins front one address to another in between batches. 
+* For this reason we have included in a verification step which assures that tokens which are used to vote cannot be used to vote a second time.
+* Once `count_ballots` has been called for a proposal and has counted all the ballots `verify_ballots` can be called.
 
 #### fn: verify_ballots
 
