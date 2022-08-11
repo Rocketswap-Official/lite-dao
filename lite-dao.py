@@ -69,11 +69,13 @@ def count_ballots(proposal_idx: int, batch_size: int = None):
          set_lp_token_value(proposal_idx=proposal_idx, token_contract_name=token_contract_name)
     
     start_idx = ProcessedBallots[proposal_idx]
-    counted_ballots = ProcessedBallots[proposal_idx]
+    #counted_ballots = ProcessedBallots[proposal_idx]
+    start_idx += 1
 
     current_ballot_idx = 0
 
     '''count the ballots'''
+    # start counting from 1 to match starting ballot id
     for i in range(0, batch_size):        
         current_ballot_idx = start_idx + i
         
@@ -87,6 +89,8 @@ def count_ballots(proposal_idx: int, batch_size: int = None):
             # Mark ballot count as ready for verification.
 
             Ballots[proposal_idx, "counted"] = True
+            # Store ballot count of processed ballots
+            ProcessedBallots[proposal_idx] = current_ballot_idx
             return
 
     ProcessedBallots[proposal_idx] = current_ballot_idx
@@ -102,6 +106,8 @@ def verify_ballots(proposal_idx: int, batch_size: int = None):
     assert Proposals[proposal_idx]["state"] is not "concluded", 'this proposal has been concluded'
 
     start_idx = VerifiedBallots[proposal_idx]
+    start_idx += 1
+
     current_ballot_idx = 0
 
     for i in range(0, batch_size):
@@ -136,6 +142,9 @@ def verify_ballots(proposal_idx: int, batch_size: int = None):
 @export 
 def cast_ballot(proposal_idx: int, choice_idx: int):    
     ballot_idx = BallotCount[proposal_idx]
+    # ensure first voter is assigned an id of 1 and subsequent voters
+    # assigned with increasing (+1) order of id
+    ballot_idx += 1
     
     '''checks'''
     assert Proposals[proposal_idx] is not False
