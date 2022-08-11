@@ -73,7 +73,7 @@ class MyTestCase(unittest.TestCase):
 
     def tearDown(self):
         self.c.flush()
-    '''
+    
     def test_01_create_proposal_should_pass(self):
         start_env = {"now": Datetime(year=2021, month=2, day=1)}
         self.lite_dao.create_proposal(environment=start_env, signer="bob", title="hello world!", description="describe the world, before it's too late :(", date_decision=Datetime(year=2021, month=3, day=1, hour=1, minute=1), choices=['choice one is the choicest', 'choice two is the choosiest', 'choice three is for the thriceiest'])
@@ -113,8 +113,8 @@ class MyTestCase(unittest.TestCase):
 
         self.lite_dao.cast_ballot(environment=env_1, signer="bob", proposal_idx=1, choice_idx=0)
         
-        ballot_vk = self.lite_dao.Ballots[1, "forwards_index", 0, "user_vk"]
-        choice = self.lite_dao.Ballots[1, "forwards_index", 0, "choice"]
+        ballot_vk = self.lite_dao.Ballots[1, "forwards_index", 1, "user_vk"]
+        choice = self.lite_dao.Ballots[1, "forwards_index", 1, "choice"]
         ballot_backwards_idx =  self.lite_dao.Ballots[1, "backwards_index", ballot_vk]
         
         self.assertEqual(ballot_vk, "bob")
@@ -127,12 +127,12 @@ class MyTestCase(unittest.TestCase):
 
         self.lite_dao.cast_ballot(environment=env_1, signer="bob", proposal_idx=1, choice_idx=0)
         
-        ballot_vk = self.lite_dao.Ballots[1, "forwards_index", 0, "user_vk"]
-        choice = self.lite_dao.Ballots[1, "forwards_index", 0, "choice"]
+        ballot_vk = self.lite_dao.Ballots[1, "forwards_index", 1, "user_vk"]
+        choice = self.lite_dao.Ballots[1, "forwards_index", 1, "choice"]
         ballot_backwards_idx =  self.lite_dao.Ballots[1, "backwards_index", ballot_vk]
         
         self.assertEqual(ballot_vk, "bob")
-        self.assertEqual(ballot_backwards_idx, 0)
+        self.assertEqual(ballot_backwards_idx, 1)
 
     def test_06_cast_ballot_after_decision_date_should_fail(self):
         env_0 = {"now": Datetime(year=2021, month=2, day=1)}
@@ -161,7 +161,7 @@ class MyTestCase(unittest.TestCase):
         # print(self.lite_dao.Ballots[1,"forwards_index", 1, "user_vk"])
         # print(self.lite_dao.Ballots[1,"forwards_index", 2, "user_vk"])
         # print(self.lite_dao.BallotCount[1])
-    '''
+    
     def test_8_counting_ballots_should_pass(self):
         env_0 = {"now": Datetime(year=2021, month=2, day=1)}
         self.lite_dao.create_proposal(environment=env_0, signer="bob", title="hello world!", description="describe the world, before it's too late :(", date_decision=Datetime(year=2021, month=3, day=1, hour=1, minute=1), choices=['choice one is the choicest', 'choice two is the choosiest', 'choice three is for the thriceiest'])
@@ -184,7 +184,70 @@ class MyTestCase(unittest.TestCase):
         counted = True
 
         self.assertEqual(self.lite_dao.BallotCount[1], ballot_count)
-        self.assertEqual(self.lite_dao.Ballots[1, "counted"], counted)
+        self.assertEqual(self.lite_dao.Ballots[1, "counted"], counted)    
+
+    def test_9_counting_ballots_in_batches_should_pass(self):
+        env_0 = {"now": Datetime(year=2021, month=2, day=1)}
+        self.lite_dao.create_proposal(environment=env_0, signer="bob", title="hello world!", description="describe the world, before it's too late :(", date_decision=Datetime(year=2021, month=3, day=1, hour=1, minute=1), choices=['choice one is the choicest', 'choice two is the choosiest', 'choice three is for the thriceiest'])
+
+        env_1 = {"now": Datetime(year=2021, month=2, day=2)}
+
+        #casting ballots 
+        self.lite_dao.cast_ballot(environment=env_1, signer="bob", proposal_idx=1, choice_idx=0)
+
+        self.lite_dao.cast_ballot(environment=env_1, signer="gifty", proposal_idx=1, choice_idx=2)
+
+        self.lite_dao.cast_ballot(environment=env_1, signer="marvin", proposal_idx=1, choice_idx=1)
+
+        self.lite_dao.cast_ballot(environment=env_1, signer="suz", proposal_idx=1, choice_idx=1)
+
+        self.lite_dao.cast_ballot(environment=env_1, signer="mel", proposal_idx=1, choice_idx=0)
+
+        self.lite_dao.cast_ballot(environment=env_1, signer="day", proposal_idx=1, choice_idx=2)
+
+        self.lite_dao.cast_ballot(environment=env_1, signer="zen", proposal_idx=1, choice_idx=1)
+
+        self.lite_dao.cast_ballot(environment=env_1, signer="roon", proposal_idx=1, choice_idx=1)
+
+        first_batch_last_ballot_idx = 4
+        second_batch_last_ballot_idx = 8
+        
+        env_2 = {"now": Datetime(year=2021, month=3, day=2)}
+        #count first batch
+        self.lite_dao.count_ballots(environment=env_2, proposal_idx=1, batch_size=4)
+        self.assertEqual(self.lite_dao.ProcessedBallots[1], first_batch_last_ballot_idx)
+
+        #count second batch
+        self.lite_dao.count_ballots(environment=env_2, proposal_idx=1, batch_size=4)
+        self.assertEqual(self.lite_dao.ProcessedBallots[1], second_batch_last_ballot_idx)
+        
+    def test_10_processed_ballots_should_equal_ballot_count_after_counting_pass(self):
+        env_0 = {"now": Datetime(year=2021, month=2, day=1)}
+        self.lite_dao.create_proposal(environment=env_0, signer="bob", title="hello world!", description="describe the world, before it's too late :(", date_decision=Datetime(year=2021, month=3, day=1, hour=1, minute=1), choices=['choice one is the choicest', 'choice two is the choosiest', 'choice three is for the thriceiest'])
+
+        env_1 = {"now": Datetime(year=2021, month=2, day=2)}
+
+        #cast ballots 
+        self.lite_dao.cast_ballot(environment=env_1, signer="bob", proposal_idx=1, choice_idx=0)
+
+        self.lite_dao.cast_ballot(environment=env_1, signer="gifty", proposal_idx=1, choice_idx=2)
+
+        self.lite_dao.cast_ballot(environment=env_1, signer="marvin", proposal_idx=1, choice_idx=1)
+
+        self.lite_dao.cast_ballot(environment=env_1, signer="suz", proposal_idx=1, choice_idx=1)
+
+        #count ballots 
+        env_2 = {"now": Datetime(year=2021, month=3, day=2)}
+        self.lite_dao.count_ballots(environment=env_2, proposal_idx=1)
+        
+        ballot_count = self.lite_dao.BallotCount[1]
+        processed_ballots_count = self.lite_dao.ProcessedBallots[1]
+
+        self.assertEqual(ballot_count, processed_ballots_count)
+       
+        
+    
+        
         
         
         #print(self.lite_dao.Ballots[1,"backwards_index", "bob"])
