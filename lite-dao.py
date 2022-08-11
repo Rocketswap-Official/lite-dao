@@ -75,7 +75,6 @@ def count_ballots(proposal_idx: int, batch_size: int = None):
     current_ballot_idx = 0
 
     '''count the ballots'''
-    # start counting from 1 to match starting ballot id
     for i in range(0, batch_size):        
         current_ballot_idx = start_idx + i
         
