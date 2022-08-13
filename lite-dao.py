@@ -112,28 +112,32 @@ def verify_ballots(proposal_idx: int, batch_size: int = None):
     for i in range(0, batch_size):
         current_ballot_idx = start_idx + i
 
-        user_vk = Ballots[proposal_idx, current_ballot_idx, "user_vk"]
-        choice = Ballots[proposal_idx, current_ballot_idx, "choice"]
-        processed_weight = Ballots[proposal_idx, current_ballot_idx, "weight"]
+        voter_vk = ProcessedBallots[proposal_idx, current_ballot_idx, "user_vk"]
+        choice = ProcessedBallots[proposal_idx, current_ballot_idx, "choice"]
+        processed_weight = ProcessedBallots[proposal_idx, current_ballot_idx, "weight"]
 
         current_weight = get_vk_weight(vk=voter_vk, proposal_idx=proposal_idx)
 
-        if current_weight >= processed_weight - (processed_weight * 0.05):
+        #if current_weight >= processed_weight - (processed_weight * 0.05):
+        if  processed_weight >= current_weight >= processed_weight - (processed_weight * 0.05):
             VerifiedBallots[proposal_idx, choice] += current_weight
         
         if current_ballot_idx == BallotCount[proposal_idx]:
 
-            choices_len = len(Proposals[proposal_idx]["results"])
+            # choices_len = len(Proposals[proposal_idx]["results"])
+            choices_len = len(Proposals[proposal_idx]["choices"])
             Ballots[proposal_idx, "verified"] = True
             Proposals[proposal_idx]["state"] = "concluded"
             Proposals[proposal_idx]["results"] = {}
 
             for c in range(0, choices_len):
                 Proposals[proposal_idx]["results"][c] = VerifiedBallots[proposal_idx, c]
-                
+               
             Proposals[proposal_idx] = Proposals[proposal_idx]
 
-            return
+            VerifiedBallots[proposal_idx] = current_ballot_idx 
+
+            return 
 
     VerifiedBallots[proposal_idx] = current_ballot_idx
     
@@ -158,7 +162,6 @@ def cast_ballot(proposal_idx: int, choice_idx: int):
     
     BallotCount[proposal_idx] += 1
 
-
 def get_vk_weight(vk:str, proposal_idx: int):
     '''
     Get the rswp value of any tokens, vtokens and LP tokens for rswp pairs (staked or not). 
@@ -174,14 +177,12 @@ def get_vk_weight(vk:str, proposal_idx: int):
 
     return user_token_total
 
-
 def get_token_value(vk:str, token_contract_name:str):
-    token_contract = ForeignHash(foreign_contract=token_contract_name, foreign_name='balances')
-    token_balance = token_contract["balances",vk] or 0
+    balances = ForeignHash(foreign_contract=token_contract_name, foreign_name='balances')
+    token_balance = balances[vk] 
 
     return token_balance
     
-
 def get_rocketfuel_value(vk:str, token_contract_name: str):
     '''
     get value of RSWP staked in rocket fuel
@@ -192,7 +193,6 @@ def get_rocketfuel_value(vk:str, token_contract_name: str):
     
     return user_rocketfuel
 
-
 def get_lp_value(vk:str, proposal_idx:int, token_contract_name: str):
     '''
     get lp value from the dex contract
@@ -202,7 +202,6 @@ def get_lp_value(vk:str, proposal_idx:int, token_contract_name: str):
     user_lp = dex_lp_points[token_contract_name, vk] or 0
 
     return user_lp * LPWeight[proposal_idx,token_contract_name]
-
 
 def get_staked_lp_value(vk: str, proposal_idx: int, token_contract_name:str):
     lp_count = 0
@@ -215,7 +214,6 @@ def get_staked_lp_value(vk: str, proposal_idx: int, token_contract_name:str):
         lp_count += vk_balance
 
     return lp_count * LPWeight[proposal_idx,token_contract_name]
-
 
 def get_staked_token_value(vk: str):
     '''iterate through v token contracts and get user balance.'''
