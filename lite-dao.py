@@ -19,10 +19,7 @@ def seed():
     metadata['token_contract'] = 'con_rswp_lst001'
     metadata['v_token_contracts'] = ['con_staking_rswp_rswp_interop_v2']
     metadata['lp_v_token_contracts'] = ['con_liq_mining_rswp_rswp']
-
-    #changed rocketswap contract name to dex for testing purpose
-    metadata['dex_contract'] = 'dex'
-    
+    metadata['dex_contract'] = 'con_rocketswap_official_v1_1'
     metadata['min_description_length'] = 10
     metadata['min_title_length'] = 10
 
