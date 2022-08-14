@@ -2,11 +2,12 @@
 
 # import currency
 import con_basic_token
-import dex
+#import dex
+import con_rocketswap_official_v1_1
 
 # Setup Tokens
 
-DEX = dex
+DEX = con_rocketswap_official_v1_1
 LIQUIDITY_TOKEN = "con_rswp"
 YIELD_TOKEN = con_basic_token
 
