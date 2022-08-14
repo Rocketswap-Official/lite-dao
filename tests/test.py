@@ -30,9 +30,9 @@ class MyTestCase(unittest.TestCase):
 
         with open("dex.py") as f:
             dex = f.read()
-            self.c.submit(dex, name="dex")
+            self.c.submit(dex, name="con_rocketswap_official_v1_1")
 
-        self.dex = self.c.get_contract("dex")
+        self.dex = self.c.get_contract("con_rocketswap_official_v1_1")
 
         with open(
             "con_liquidity_mining_smart_epoch.py"
@@ -77,8 +77,8 @@ class MyTestCase(unittest.TestCase):
         self.rswp.transfer(signer="sys", to="roon", amount=20000)
         
         # approve dex to spend tokens
-        self.currency.approve(signer="sys", amount=999999999, to="dex")
-        self.rswp.approve(signer="sys", amount=999999999, to="dex")
+        self.currency.approve(signer="sys", amount=999999999, to="con_rocketswap_official_v1_1")
+        self.rswp.approve(signer="sys", amount=999999999, to="con_rocketswap_official_v1_1")
 
     def tearDown(self):
         self.c.flush()
@@ -279,7 +279,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(self.lite_dao.VerifiedBallots[1, 1], weight_for_option_1)
         self.assertEqual(self.lite_dao.VerifiedBallots[1, 2], weight_for_option_2)
     
-    def test_12_moving_assets_between_addresses_between_batches_should_not_count(self):
+    def test_12_more_than_5_perc_change_in_voting_weight_should_not_count(self):
         env_0 = {"now": Datetime(year=2021, month=2, day=1)}
         # create proposal
         self.lite_dao.create_proposal(environment=env_0, signer="bob", title="hello world!", description="describe the world, before it's too late :(", date_decision=Datetime(year=2021, month=3, day=1, hour=1, minute=1), choices=['choice one is the choicest', 'choice two is the choosiest', 'choice three is for the thriceiest'])
@@ -297,42 +297,34 @@ class MyTestCase(unittest.TestCase):
         self.lite_dao.cast_ballot(environment=env_2, signer="day", proposal_idx=1, choice_idx=2)
         self.lite_dao.cast_ballot(environment=env_2, signer="zen", proposal_idx=1, choice_idx=1)
         self.lite_dao.cast_ballot(environment=env_2, signer="roon", proposal_idx=1, choice_idx=1)
-
-        first_batch_last_ballot_idx = 4
-        second_batch_last_ballot_idx = 8
         
         env_3 = {"now": Datetime(year=2021, month=3, day=2)}
         # count first batch
         self.lite_dao.count_ballots(environment=env_3, proposal_idx=1, batch_size=4)
-
-        weight_for_option_0 = 972728 # bob's weight
-        weight_for_option_1 = 360000
-        weight_for_option_2 = 560000
-
+        
         # bob transfers tokens to day
         env_4 = {"now": Datetime(year=2021, month=3, day=2, hour=1, minute=5)}
-        self.rswp.transfer(environment=env_4, signer="bob", to="day", amount=900000)
+        self.rswp.transfer(environment=env_4, signer="bob", to="day", amount=48637.4)
         
         env_5 = {"now": Datetime(year=2021, month=3, day=2, hour=1, minute=10)}
         # count second batch
         self.lite_dao.count_ballots(environment=env_5, proposal_idx=1, batch_size=4)
 
-        weight_for_option_0 = 80000 # only mel's weight. bob's weight is not counted
+        weight_for_option_0 = 1052728 # mel's weight + bob's weight 
         weight_for_option_1 = 360000
-        weight_for_option_2 = 1460000 # weight increases due to bob's transfer
+        weight_for_option_2 = 560000
         
         # verify ballots
         env_6 = {"now": Datetime(year=2021, month=3, day=2, hour=1, minute=20)}
         self.lite_dao.verify_ballots(environment=env_6, proposal_idx=1)
 
+        weight_for_option_0 = 80000 # only mel's weight. bob's weight is not counted
+        weight_for_option_1 = 360000
+        weight_for_option_2 = 608637.4 # weight increases due to bob's transfer to day
         
         self.assertEqual(self.lite_dao.VerifiedBallots[1, 0], weight_for_option_0)
         self.assertEqual(self.lite_dao.VerifiedBallots[1, 1], weight_for_option_1)
         self.assertEqual(self.lite_dao.VerifiedBallots[1, 2], weight_for_option_2)
-        
-
-        
-        
         
 
 
