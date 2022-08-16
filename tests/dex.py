@@ -22,7 +22,7 @@ state = Hash()
 @construct
 def seed(): #These are supposed to be constants, but they are changable
     state["FEE_PERCENTAGE"] = 0.3 / 100
-    state["TOKEN_CONTRACT"] = "con_amm"
+    state["TOKEN_CONTRACT"] = "con_rswp_lst001"
     state["TOKEN_DISCOUNT"] = 0.75
     state["BURN_PERCENTAGE"] = 0.8
     state["BURN_ADDRESS"] = "0x0" #Change this
