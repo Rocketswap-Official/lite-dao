@@ -115,8 +115,7 @@ def verify_ballots(proposal_idx: int, batch_size: int = None):
 
         current_weight = get_vk_weight(vk=voter_vk, proposal_idx=proposal_idx)
 
-        #if current_weight >= processed_weight - (processed_weight * 0.05):
-        if  processed_weight >= current_weight >= processed_weight - (processed_weight * 0.05):
+        if current_weight >= processed_weight - (processed_weight * 0.05):
             VerifiedBallots[proposal_idx, choice] += current_weight
         
         if current_ballot_idx == BallotCount[proposal_idx]:
@@ -158,7 +157,7 @@ def cast_ballot(proposal_idx: int, choice_idx: int):
     Ballots[proposal_idx,"backwards_index", ctx.signer] = ballot_idx
     
     BallotCount[proposal_idx] += 1
-
+@export    
 def get_vk_weight(vk:str, proposal_idx: int):
     '''
     Get the rswp value of any tokens, vtokens and LP tokens for rswp pairs (staked or not). 
@@ -168,9 +167,9 @@ def get_vk_weight(vk:str, proposal_idx: int):
 
     user_token_total += get_token_value(vk=vk, token_contract_name=token_contract_name)
     user_token_total += get_staked_token_value(vk=vk)
-    user_token_total += get_staked_lp_value(vk=vk, proposal_idx=proposal_idx, token_contract_name=token_contract_name)
-    user_token_total += get_lp_value(vk=vk, proposal_idx=proposal_idx, token_contract_name=token_contract_name)
     user_token_total += get_rocketfuel_value(vk=vk, token_contract_name=token_contract_name)
+    user_token_total += get_lp_value(vk=vk, proposal_idx=proposal_idx, token_contract_name=token_contract_name)
+    user_token_total += get_staked_lp_value(vk=vk, proposal_idx=proposal_idx, token_contract_name=token_contract_name)
 
     return user_token_total
 
@@ -179,6 +178,17 @@ def get_token_value(vk:str, token_contract_name:str):
     token_balance = balances[vk] 
 
     return token_balance
+
+def get_staked_token_value(vk: str):
+    '''iterate through v token contracts and get user balance.'''
+    count = 0
+    staking_contract_names = metadata['v_token_contracts']
+
+    for contract in staking_contract_names:
+        balances = ForeignHash(foreign_contract=contract, foreign_name='balances')
+        vk_balance = balances[vk] or 0
+
+    return count
     
 def get_rocketfuel_value(vk:str, token_contract_name: str):
     '''
@@ -202,7 +212,7 @@ def get_lp_value(vk:str, proposal_idx:int, token_contract_name: str):
 
 def get_staked_lp_value(vk: str, proposal_idx: int, token_contract_name:str):
     lp_count = 0
-    staking_contract_names = metadata['v_token_contracts']
+    staking_contract_names = metadata['lp_v_token_contracts']
     lp_token_value = LPWeight[proposal_idx,token_contract_name]
 
     for contract in staking_contract_names:
@@ -211,18 +221,6 @@ def get_staked_lp_value(vk: str, proposal_idx: int, token_contract_name:str):
         lp_count += vk_balance
 
     return lp_count * LPWeight[proposal_idx,token_contract_name]
-
-def get_staked_token_value(vk: str):
-    '''iterate through v token contracts and get user balance.'''
-    count = 0
-    staking_contract_names = metadata['v_token_contracts']
-
-    for contract in staking_contract_names:
-        balances = ForeignHash(foreign_contract=contract, foreign_name='balances')
-        vk_balance = balances[vk] or 0
-
-    return count
-
 
 def set_lp_token_value(proposal_idx: int, token_contract_name: str):
     '''
