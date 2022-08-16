@@ -1,13 +1,13 @@
 # Imports
 
-import con_basic_token
+import con_rswp_lst001
 
 I = importlib
 
 # Setup Tokens
 
-STAKING_TOKEN = con_basic_token
-YIELD_TOKEN = con_basic_token
+STAKING_TOKEN = con_rswp_lst001
+YIELD_TOKEN = con_rswp_lst001
 
 # State
 
