@@ -1,15 +1,13 @@
 # Imports
 
-# import currency
-import con_basic_token
-#import dex
+import con_rswp_lst001
 import con_rocketswap_official_v1_1
 
 # Setup Tokens
 
 DEX = con_rocketswap_official_v1_1
-LIQUIDITY_TOKEN = "con_rswp"
-YIELD_TOKEN = con_basic_token
+LIQUIDITY_TOKEN = "con_rswp_lst001"
+YIELD_TOKEN = con_rswp_lst001
 
 # State
 
@@ -56,7 +54,7 @@ def seed():
     meta["version"] = "0.5"
     meta["type"] = "liquidity_mining_smart_epoch"  # staking || lp_farming
     meta["STAKING_TOKEN"] = "con_rswp_lp"
-    meta["YIELD_TOKEN"] = "con_basic_token"
+    meta["YIELD_TOKEN"] = "con_rswp_lst001"
 
     DevRewardPct.set(1 / 10)
 
