@@ -2,7 +2,6 @@ import unittest
 
 from contracting.client import ContractingClient
 from contracting.stdlib.bridge.time import Datetime
-#from contracting.stdlib.bridge.decimal import ContractingDecimal
 
 
 class MyTestCase(unittest.TestCase):
@@ -99,8 +98,6 @@ class MyTestCase(unittest.TestCase):
         self.dex.approve_liquidity(signer="day", contract="con_rswp_lst001", to="con_liquidity_mining_smart_epoch", amount=999999999)
         self.dex.approve_liquidity(signer="zen", contract="con_rswp_lst001", to="con_liquidity_mining_smart_epoch", amount=999999999)
         self.dex.approve_liquidity(signer="roon", contract="con_rswp_lst001", to="con_liquidity_mining_smart_epoch", amount=999999999)
-
-        #self.rswp.approve(signer="sys", amount=999999999999, to="bob")
         
         # create a TAU-RSWP pair pool
         self.dex.create_market(signer="sys", contract="con_rswp_lst001", currency_amount=1000, token_amount=2000)
@@ -125,9 +122,6 @@ class MyTestCase(unittest.TestCase):
         self.rswp.transfer(signer="sys", to="zen", amount=40000)
         self.rswp.transfer(signer="sys", to="roon", amount=20000)
         
-        # approve dex to spend tokens
-        
-
         # add liquidity to TAU-RSWP pool
         self.dex.add_liquidity(signer="bob", contract="con_rswp_lst001", currency_amount=2000)
         self.dex.add_liquidity(signer="gifty", contract="con_rswp_lst001", currency_amount=2000)
@@ -246,7 +240,7 @@ class MyTestCase(unittest.TestCase):
             self.lite_dao.cast_ballot(environment=env_1, signer="jane", proposal_idx=1, choice_idx=1)
 
 
-    def test_7_cast_two_ballots_should_fail(self):
+    def test_07_cast_two_ballots_should_fail(self):
         env_0 = {"now": Datetime(year=2022, month=2, day=1)}
         # create proposal
         self.lite_dao.create_proposal(environment=env_0, signer="bob", title="hello world!", description="describe the world, before it's too late :(", date_decision=Datetime(year=2022, month=3, day=1, hour=1, minute=1), choices=['choice one is the choicest', 'choice two is the choosiest', 'choice three is for the thriceiest'])
@@ -265,7 +259,7 @@ class MyTestCase(unittest.TestCase):
         # print(self.lite_dao.Ballots[1,"forwards_index", 2, "user_vk"])
         # print(self.lite_dao.BallotCount[1])
     
-    def test_8_counting_ballots_should_pass(self):
+    def test_08_counting_ballots_should_pass(self):
         env_0 = {"now": Datetime(year=2022, month=2, day=1)}
         # create proposal
         self.lite_dao.create_proposal(environment=env_0, signer="bob", title="hello world!", description="describe the world, before it's too late :(", date_decision=Datetime(year=2022, month=3, day=1, hour=1, minute=1), choices=['choice one is the choicest', 'choice two is the choosiest', 'choice three is for the thriceiest'])
@@ -288,7 +282,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(self.lite_dao.BallotCount[1], ballot_count)
         self.assertEqual(self.lite_dao.Ballots[1, "counted"], counted)    
 
-    def test_9_counting_ballots_in_batches_should_pass(self):
+    def test_09_counting_ballots_in_batches_should_pass(self):
         env_0 = {"now": Datetime(year=2022, month=2, day=1)}
         # create proposal
         self.lite_dao.create_proposal(environment=env_0, signer="bob", title="hello world!", description="describe the world, before it's too late :(", date_decision=Datetime(year=2022, month=3, day=1, hour=1, minute=1), choices=['choice one is the choicest', 'choice two is the choosiest', 'choice three is for the thriceiest'])
@@ -366,8 +360,33 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(self.lite_dao.VerifiedBallots[1, 0], weight_for_option_0)
         self.assertEqual(self.lite_dao.VerifiedBallots[1, 1], weight_for_option_1)
         self.assertEqual(self.lite_dao.VerifiedBallots[1, 2], weight_for_option_2)
+
+    def test_12_verified_ballots_should_equal_ballot_count_after_verifying_pass(self):
+        env_0 = {"now": Datetime(year=2022, month=2, day=1)}
+        # create proposal
+        self.lite_dao.create_proposal(environment=env_0, signer="bob", title="hello world!", description="describe the world, before it's too late :(", date_decision=Datetime(year=2022, month=3, day=1, hour=1, minute=1), choices=['choice one is the choicest', 'choice two is the choosiest', 'choice three is for the thriceiest'])
+
+        env_1 = {"now": Datetime(year=2022, month=2, day=2)}
+
+        # cast ballots 
+        self.lite_dao.cast_ballot(environment=env_1, signer="bob", proposal_idx=1, choice_idx=0)
+        self.lite_dao.cast_ballot(environment=env_1, signer="gifty", proposal_idx=1, choice_idx=2)
+        self.lite_dao.cast_ballot(environment=env_1, signer="marvin", proposal_idx=1, choice_idx=1)
+        self.lite_dao.cast_ballot(environment=env_1, signer="suz", proposal_idx=1, choice_idx=1)
+
+        # # count ballots 
+        env_2 = {"now": Datetime(year=2022, month=3, day=2)}
+        self.lite_dao.count_ballots(environment=env_2, proposal_idx=1)
+        # # verify ballots
+        env_3 = {"now": Datetime(year=2022, month=3, day=2, hour=2)}
+        self.lite_dao.verify_ballots(environment=env_3, proposal_idx=1)
+
+        ballot_count = self.lite_dao.BallotCount[1]
+        processed_ballots_count = self.lite_dao.VerifiedBallots[1]
+
+        self.assertEqual(ballot_count, processed_ballots_count)
     
-    def test_12_more_than_5_perc_change_in_voting_weight_should_not_count(self):
+    def test_13_more_than_5_perc_change_in_voting_weight_should_not_count(self):
         env_0 = {"now": Datetime(year=2022, month=2, day=1)}
         # create proposal
         self.lite_dao.create_proposal(environment=env_0, signer="bob", title="hello world!", description="describe the world, before it's too late :(", date_decision=Datetime(year=2022, month=3, day=1, hour=1, minute=1), choices=['choice one is the choicest', 'choice two is the choosiest', 'choice three is for the thriceiest'])
