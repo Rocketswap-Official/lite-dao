@@ -36,6 +36,8 @@ def create_proposal(title:str, description: str, date_decision: datetime.datetim
     for choice in choices:
         assert len(choice) > 0, 'choice cannot be an empty string.'
 
+    deduct_fee()
+
     ProposalCount.set(ProposalCount.get() + 1)
     Proposals[ProposalCount.get()] = {
         "title":title,
@@ -44,8 +46,6 @@ def create_proposal(title:str, description: str, date_decision: datetime.datetim
         "choices": choices,
         "state": "open"
     }
-    deduct_fee()
-
 
 def deduct_fee():
     token_contract = I.import_module(metadata['fee_currency'])
@@ -66,7 +66,6 @@ def count_ballots(proposal_idx: int, batch_size: int = None):
          set_lp_token_value(proposal_idx=proposal_idx, token_contract_name=token_contract_name)
     
     start_idx = ProcessedBallots[proposal_idx]
-    #counted_ballots = ProcessedBallots[proposal_idx]
     start_idx += 1
 
     current_ballot_idx = 0
@@ -120,7 +119,6 @@ def verify_ballots(proposal_idx: int, batch_size: int = None):
         
         if current_ballot_idx == BallotCount[proposal_idx]:
 
-            # choices_len = len(Proposals[proposal_idx]["results"])
             choices_len = len(Proposals[proposal_idx]["choices"])
             Ballots[proposal_idx, "verified"] = True
             Proposals[proposal_idx]["state"] = "concluded"
@@ -141,8 +139,6 @@ def verify_ballots(proposal_idx: int, batch_size: int = None):
 @export 
 def cast_ballot(proposal_idx: int, choice_idx: int):    
     ballot_idx = BallotCount[proposal_idx]
-    # ensure first voter is assigned an id of 1 and subsequent voters
-    # assigned with increasing (+1) order of id
     ballot_idx += 1
     
     '''checks'''
