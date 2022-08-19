@@ -46,6 +46,7 @@ def create_proposal(title:str, description: str, date_decision: datetime.datetim
         "choices": choices,
         "state": "open"
     }
+    
 
 def deduct_fee():
     token_contract = I.import_module(metadata['fee_currency'])
