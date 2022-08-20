@@ -154,6 +154,7 @@ def cast_ballot(proposal_idx: int, choice_idx: int):
     Ballots[proposal_idx,"backwards_index", ctx.signer] = ballot_idx
     
     BallotCount[proposal_idx] += 1
+
 @export    
 def get_vk_weight(vk:str, proposal_idx: int):
     '''
@@ -170,23 +171,26 @@ def get_vk_weight(vk:str, proposal_idx: int):
 
     return user_token_total
 
+@export
 def get_token_value(vk:str, token_contract_name:str):
     balances = ForeignHash(foreign_contract=token_contract_name, foreign_name='balances')
     token_balance = balances[vk] 
 
     return token_balance
 
+@export
 def get_staked_token_value(vk: str):
     '''iterate through v token contracts and get user balance.'''
-    count = 0
+    vk_balance = 0
     staking_contract_names = metadata['v_token_contracts']
 
     for contract in staking_contract_names:
         balances = ForeignHash(foreign_contract=contract, foreign_name='balances')
-        vk_balance = balances[vk] or 0
+        vk_balance += balances[vk] 
 
-    return count
-    
+    return vk_balance
+
+@export    
 def get_rocketfuel_value(vk:str, token_contract_name: str):
     '''
     get value of RSWP staked in rocket fuel
@@ -197,6 +201,7 @@ def get_rocketfuel_value(vk:str, token_contract_name: str):
     
     return user_rocketfuel
 
+@export
 def get_lp_value(vk:str, proposal_idx:int, token_contract_name: str):
     '''
     get lp value from the dex contract
@@ -207,6 +212,7 @@ def get_lp_value(vk:str, proposal_idx:int, token_contract_name: str):
 
     return user_lp * LPWeight[proposal_idx,token_contract_name]
 
+@export
 def get_staked_lp_value(vk: str, proposal_idx: int, token_contract_name:str):
     lp_count = 0
     staking_contract_names = metadata['lp_v_token_contracts']
@@ -236,7 +242,6 @@ def set_lp_token_value(proposal_idx: int, token_contract_name: str):
 
 def assert_operator():
     assert ctx.caller == metadata['operator'], "You are not the listed operator for this contract."
-
 
 @export
 def change_meta(key: str, value: Any):
