@@ -21,11 +21,13 @@ class MyTestCase(unittest.TestCase):
 
         with open("con_staking_smart_epoch_compounding_single_asset.py") as f:
             code = f.read()
-            self.c.submit(code, name="con_staking_smart_epoch_single_asset")
+            self.c.submit(code, name="con_staking_rswp_rswp_interop_v2")
 
-        self.contract_single_asset = self.c.get_contract(
-            "con_staking_smart_epoch_single_asset"
-        )
+        # self.contract_single_asset = self.c.get_contract(
+        #     "con_staking_rswp_rswp_interop_v2"
+        # )
+
+        self.contract_single_asset = self.c.get_contract("con_staking_rswp_rswp_interop_v2")
 
         with open("dex.py") as f:
             dex = f.read()
@@ -37,9 +39,10 @@ class MyTestCase(unittest.TestCase):
             "con_liquidity_mining_smart_epoch.py"
         ) as f:
             code = f.read()
-            self.c.submit(code, name="con_liquidity_mining_smart_epoch")
+            self.c.submit(code, name="con_liq_mining_rswp_rswp")
 
-        self.yield_farm = self.c.get_contract("con_liquidity_mining_smart_epoch")
+        #self.yield_farm = self.c.get_contract("con_liq_mining_rswp_rswp")
+        self.yield_farm = self.c.get_contract("con_liq_mining_rswp_rswp")
 
 
         with open(
@@ -81,23 +84,23 @@ class MyTestCase(unittest.TestCase):
         self.rswp.approve(signer="zen", amount=999999999, to="con_rocketswap_official_v1_1")
         self.rswp.approve(signer="roon", amount=999999999, to="con_rocketswap_official_v1_1")
         ## RSWP approval for single-asset-compound contract to spend
-        self.rswp.approve(signer="bob", amount=999999999, to="con_staking_smart_epoch_single_asset")
-        self.rswp.approve(signer="gifty", amount=999999999, to="con_staking_smart_epoch_single_asset")
-        self.rswp.approve(signer="marvin", amount=999999999, to="con_staking_smart_epoch_single_asset")
-        self.rswp.approve(signer="suz", amount=999999999, to="con_staking_smart_epoch_single_asset")
-        self.rswp.approve(signer="mel", amount=999999999, to="con_staking_smart_epoch_single_asset")
-        self.rswp.approve(signer="day", amount=999999999, to="con_staking_smart_epoch_single_asset")
-        self.rswp.approve(signer="zen", amount=999999999, to="con_staking_smart_epoch_single_asset")
-        self.rswp.approve(signer="roon", amount=999999999, to="con_staking_smart_epoch_single_asset")
+        self.rswp.approve(signer="bob", amount=999999999, to="con_staking_rswp_rswp_interop_v2")
+        self.rswp.approve(signer="gifty", amount=999999999, to="con_staking_rswp_rswp_interop_v2")
+        self.rswp.approve(signer="marvin", amount=999999999, to="con_staking_rswp_rswp_interop_v2")
+        self.rswp.approve(signer="suz", amount=999999999, to="con_staking_rswp_rswp_interop_v2")
+        self.rswp.approve(signer="mel", amount=999999999, to="con_staking_rswp_rswp_interop_v2")
+        self.rswp.approve(signer="day", amount=999999999, to="con_staking_rswp_rswp_interop_v2")
+        self.rswp.approve(signer="zen", amount=999999999, to="con_staking_rswp_rswp_interop_v2")
+        self.rswp.approve(signer="roon", amount=999999999, to="con_staking_rswp_rswp_interop_v2")
         # RSWP LP approval for liquidity farm contract to spend
-        self.dex.approve_liquidity(signer="bob", contract="con_rswp_lst001", to="con_liquidity_mining_smart_epoch", amount=999999999)
-        self.dex.approve_liquidity(signer="gifty", contract="con_rswp_lst001", to="con_liquidity_mining_smart_epoch", amount=999999999)
-        self.dex.approve_liquidity(signer="marvin", contract="con_rswp_lst001", to="con_liquidity_mining_smart_epoch", amount=999999999)
-        self.dex.approve_liquidity(signer="suz", contract="con_rswp_lst001", to="con_liquidity_mining_smart_epoch", amount=999999999)
-        self.dex.approve_liquidity(signer="mel", contract="con_rswp_lst001", to="con_liquidity_mining_smart_epoch", amount=999999999)
-        self.dex.approve_liquidity(signer="day", contract="con_rswp_lst001", to="con_liquidity_mining_smart_epoch", amount=999999999)
-        self.dex.approve_liquidity(signer="zen", contract="con_rswp_lst001", to="con_liquidity_mining_smart_epoch", amount=999999999)
-        self.dex.approve_liquidity(signer="roon", contract="con_rswp_lst001", to="con_liquidity_mining_smart_epoch", amount=999999999)
+        self.dex.approve_liquidity(signer="bob", contract="con_rswp_lst001", to="con_liq_mining_rswp_rswp", amount=999999999)
+        self.dex.approve_liquidity(signer="gifty", contract="con_rswp_lst001", to="con_liq_mining_rswp_rswp", amount=999999999)
+        self.dex.approve_liquidity(signer="marvin", contract="con_rswp_lst001", to="con_liq_mining_rswp_rswp", amount=999999999)
+        self.dex.approve_liquidity(signer="suz", contract="con_rswp_lst001", to="con_liq_mining_rswp_rswp", amount=999999999)
+        self.dex.approve_liquidity(signer="mel", contract="con_rswp_lst001", to="con_liq_mining_rswp_rswp", amount=999999999)
+        self.dex.approve_liquidity(signer="day", contract="con_rswp_lst001", to="con_liq_mining_rswp_rswp", amount=999999999)
+        self.dex.approve_liquidity(signer="zen", contract="con_rswp_lst001", to="con_liq_mining_rswp_rswp", amount=999999999)
+        self.dex.approve_liquidity(signer="roon", contract="con_rswp_lst001", to="con_liq_mining_rswp_rswp", amount=999999999)
         
         # create a TAU-RSWP pair pool
         self.dex.create_market(signer="sys", contract="con_rswp_lst001", currency_amount=1000, token_amount=2000)
@@ -259,7 +262,31 @@ class MyTestCase(unittest.TestCase):
         # print(self.lite_dao.Ballots[1,"forwards_index", 2, "user_vk"])
         # print(self.lite_dao.BallotCount[1])
     
-    def test_08_counting_ballots_should_pass(self):
+    def test_08_get_vk_weight_value_passes(self):
+        env_0 = {"now": Datetime(year=2022, month=2, day=1)}
+        # create proposal
+        self.lite_dao.create_proposal(environment=env_0, signer="bob", title="hello world!", description="describe the world, before it's too late :(", date_decision=Datetime(year=2022, month=3, day=1, hour=1, minute=1), choices=['choice one is the choicest', 'choice two is the choosiest', 'choice three is for the thriceiest'])
+        
+        env_1 = {"now": Datetime(year=2022, month=2, day=2)}
+        # cast ballot
+        self.lite_dao.cast_ballot(environment=env_1, signer="bob", proposal_idx=1, choice_idx=0)
+
+        env_2 = {"now": Datetime(year=2022, month=3, day=2, hour=1, minute=10)}
+        # count ballot
+        self.lite_dao.count_ballots(environment=env_2, proposal_idx=1)
+        
+        token_balance = self.rswp.balances["bob"]
+        staked_token_value = self.contract_single_asset.balances["bob"]
+        rocketfuel_value = self.dex.staked_amount["bob", "con_rswp_lst001"]
+        lp_value = self.lite_dao.get_lp_value(signer="bob", vk="bob", proposal_idx=1, token_contract_name="con_rswp_lst001")
+        staked_lp_value = self.lite_dao.get_staked_lp_value(signer="bob", vk="bob", proposal_idx=1, token_contract_name="con_rswp_lst001")
+
+        total_vk_weight = token_balance + staked_token_value + rocketfuel_value + lp_value + staked_lp_value
+        vk_weight = self.lite_dao.get_vk_weight(signer="bob", vk="bob", proposal_idx=1)
+        
+        self.assertEqual(vk_weight, total_vk_weight)
+
+    def test_09_counting_ballots_should_pass(self):
         env_0 = {"now": Datetime(year=2022, month=2, day=1)}
         # create proposal
         self.lite_dao.create_proposal(environment=env_0, signer="bob", title="hello world!", description="describe the world, before it's too late :(", date_decision=Datetime(year=2022, month=3, day=1, hour=1, minute=1), choices=['choice one is the choicest', 'choice two is the choosiest', 'choice three is for the thriceiest'])
@@ -282,7 +309,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(self.lite_dao.BallotCount[1], ballot_count)
         self.assertEqual(self.lite_dao.Ballots[1, "counted"], counted)    
 
-    def test_09_counting_ballots_in_batches_should_pass(self):
+    def test_10_counting_ballots_in_batches_should_pass(self):
         env_0 = {"now": Datetime(year=2022, month=2, day=1)}
         # create proposal
         self.lite_dao.create_proposal(environment=env_0, signer="bob", title="hello world!", description="describe the world, before it's too late :(", date_decision=Datetime(year=2022, month=3, day=1, hour=1, minute=1), choices=['choice one is the choicest', 'choice two is the choosiest', 'choice three is for the thriceiest'])
@@ -311,7 +338,7 @@ class MyTestCase(unittest.TestCase):
         self.lite_dao.count_ballots(environment=env_2, proposal_idx=1, batch_size=4)
         self.assertEqual(self.lite_dao.ProcessedBallots[1], second_batch_last_ballot_idx)
         
-    def test_10_processed_ballots_should_equal_ballot_count_after_counting_pass(self):
+    def test_11_processed_ballots_should_equal_ballot_count_after_counting_pass(self):
         env_0 = {"now": Datetime(year=2022, month=2, day=1)}
         # create proposal
         self.lite_dao.create_proposal(environment=env_0, signer="bob", title="hello world!", description="describe the world, before it's too late :(", date_decision=Datetime(year=2022, month=3, day=1, hour=1, minute=1), choices=['choice one is the choicest', 'choice two is the choosiest', 'choice three is for the thriceiest'])
@@ -333,7 +360,7 @@ class MyTestCase(unittest.TestCase):
 
         self.assertEqual(ballot_count, processed_ballots_count)
     
-    def test_11_verifying_ballots_should_pass(self):
+    def test_12_verifying_ballots_should_pass(self):
         env_0 = {"now": Datetime(year=2022, month=2, day=1)}
         # create proposal
         self.lite_dao.create_proposal(environment=env_0, signer="bob", title="hello world!", description="describe the world, before it's too late :(", date_decision=Datetime(year=2022, month=3, day=1, hour=1, minute=1), choices=['choice one is the choicest', 'choice two is the choosiest', 'choice three is for the thriceiest'])
@@ -353,15 +380,20 @@ class MyTestCase(unittest.TestCase):
         env_3 = {"now": Datetime(year=2022, month=3, day=2, hour=2)}
         self.lite_dao.verify_ballots(environment=env_3, proposal_idx=1)
 
-        weight_for_option_0 = 971728 
-        weight_for_option_1 = 298000
-        weight_for_option_2 = 499000
+        weight_of_bob = self.lite_dao.get_vk_weight(signer="bob", vk="bob", proposal_idx=1)
+        weight_of_gifty = self.lite_dao.get_vk_weight(signer="gifty", vk="gifty", proposal_idx=1)
+        weight_of_marvin = self.lite_dao.get_vk_weight(signer="marvin", vk="marvin", proposal_idx=1)
+        weight_of_suz = self.lite_dao.get_vk_weight(signer="suz", vk="suz", proposal_idx=1)
 
+        weight_for_option_0 = weight_of_bob #971728 
+        weight_for_option_1 = weight_of_marvin + weight_of_suz #298000
+        weight_for_option_2 = weight_of_gifty #499000
+        
         self.assertEqual(self.lite_dao.VerifiedBallots[1, 0], weight_for_option_0)
         self.assertEqual(self.lite_dao.VerifiedBallots[1, 1], weight_for_option_1)
         self.assertEqual(self.lite_dao.VerifiedBallots[1, 2], weight_for_option_2)
-
-    def test_12_verified_ballots_should_equal_ballot_count_after_verifying_pass(self):
+    
+    def test_13_verified_ballots_should_equal_ballot_count_after_verifying_pass(self):
         env_0 = {"now": Datetime(year=2022, month=2, day=1)}
         # create proposal
         self.lite_dao.create_proposal(environment=env_0, signer="bob", title="hello world!", description="describe the world, before it's too late :(", date_decision=Datetime(year=2022, month=3, day=1, hour=1, minute=1), choices=['choice one is the choicest', 'choice two is the choosiest', 'choice three is for the thriceiest'])
@@ -386,7 +418,7 @@ class MyTestCase(unittest.TestCase):
 
         self.assertEqual(ballot_count, processed_ballots_count)
     
-    def test_13_more_than_5_perc_change_in_voting_weight_should_not_count(self):
+    def test_14_more_than_5_perc_change_in_voting_weight_should_not_count(self):
         env_0 = {"now": Datetime(year=2022, month=2, day=1)}
         # create proposal
         self.lite_dao.create_proposal(environment=env_0, signer="bob", title="hello world!", description="describe the world, before it's too late :(", date_decision=Datetime(year=2022, month=3, day=1, hour=1, minute=1), choices=['choice one is the choicest', 'choice two is the choosiest', 'choice three is for the thriceiest'])
@@ -408,30 +440,46 @@ class MyTestCase(unittest.TestCase):
         env_3 = {"now": Datetime(year=2022, month=3, day=2)}
         # count first batch
         self.lite_dao.count_ballots(environment=env_3, proposal_idx=1, batch_size=4)
+        # measure weight
+        weight_of_bob = self.lite_dao.get_vk_weight(signer="bob", vk="bob", proposal_idx=1)
+        weight_of_gifty = self.lite_dao.get_vk_weight(signer="gifty", vk="gifty", proposal_idx=1)
+        weight_of_marvin = self.lite_dao.get_vk_weight(signer="marvin", vk="marvin", proposal_idx=1)
+        weight_of_suz = self.lite_dao.get_vk_weight(signer="suz", vk="suz", proposal_idx=1)
+
+        weight_for_option_0 = weight_of_bob 
+        weight_for_option_1 = weight_of_marvin + weight_of_suz 
+        weight_for_option_2 = weight_of_gifty 
         
         # bob transfers tokens to day
         env_4 = {"now": Datetime(year=2022, month=3, day=2, hour=1, minute=5)}
-        self.rswp.transfer(environment=env_4, signer="bob", to="day", amount=48637)
+        self.rswp.transfer(environment=env_4, signer="bob", to="day", amount=49637)
         
         env_5 = {"now": Datetime(year=2022, month=3, day=2, hour=1, minute=10)}
         # count second batch
         self.lite_dao.count_ballots(environment=env_5, proposal_idx=1, batch_size=4)
+        # measure new weight
+        weight_of_bob = self.lite_dao.get_vk_weight(signer="bob", vk="bob", proposal_idx=1)
+        weight_of_gifty = self.lite_dao.get_vk_weight(signer="gifty", vk="gifty", proposal_idx=1)
+        weight_of_marvin = self.lite_dao.get_vk_weight(signer="marvin", vk="marvin", proposal_idx=1)
+        weight_of_suz = self.lite_dao.get_vk_weight(signer="suz", vk="suz", proposal_idx=1)
+        weight_of_mel = self.lite_dao.get_vk_weight(signer="mel", vk="mel", proposal_idx=1)
+        weight_of_day = self.lite_dao.get_vk_weight(signer="day", vk="day", proposal_idx=1)
+        weight_of_zen = self.lite_dao.get_vk_weight(signer="zen", vk="zen", proposal_idx=1)
+        weight_of_roon = self.lite_dao.get_vk_weight(signer="roon", vk="roon", proposal_idx=1)
 
-        weight_for_option_0 = 1050728 # bob's weight + mel's weight   
-        weight_for_option_1 = 356000
-        weight_for_option_2 = 560000
-        
         # verify ballots
         env_6 = {"now": Datetime(year=2022, month=3, day=2, hour=1, minute=20)}
         self.lite_dao.verify_ballots(environment=env_6, proposal_idx=1)
 
-        weight_for_option_0 = 79000 # only mel's weight. bob's weight is not counted
-        weight_for_option_1 = 356000
-        weight_for_option_2 = 606637 # weight increases due to bob's transfer to day
+        weight_for_option_0 = weight_of_bob + weight_of_mel - weight_of_bob # bob's weight is not counted
+        weight_for_option_1 += weight_of_zen + weight_of_roon 
+        weight_for_option_2 += weight_of_day # weight increases due to bob's transfer to day
         
         self.assertEqual(self.lite_dao.VerifiedBallots[1, 0], weight_for_option_0)
         self.assertEqual(self.lite_dao.VerifiedBallots[1, 1], weight_for_option_1)
         self.assertEqual(self.lite_dao.VerifiedBallots[1, 2], weight_for_option_2)
-
+    
+    
+    
 if __name__ == "__main__":
     unittest.main()
