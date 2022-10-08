@@ -1,13 +1,10 @@
 Proposals = Hash(default_value = None)
-#ProposalCount = Variable
 Ballots = Hash(default_value = False)
 BallotCount = Hash(default_value = 0)
 ProposalCount = Variable()
-CastChoiceWeight = Hash(default_value = 0)
 ProcessedBallots = Hash(default_value = 0)
 VerifiedBallots = Hash(default_value = 0)
 LPWeight = Hash(default_value = 0)
-FinalCount = Hash(default_value = 0)
 metadata = Hash(default_value = None)
 
 I = importlib
@@ -127,7 +124,7 @@ def verify_ballots(proposal_idx: int, batch_size: int = None):
             Proposals[proposal_idx]["results"] = {}
 
             for c in range(0, choices_len):
-                Proposals[proposal_idx]["results"][c] = VerifiedBallots[proposal_idx, c]
+                Proposals[proposal_idx]["results"][str(c)] = VerifiedBallots[proposal_idx, c]
                
             Proposals[proposal_idx] = Proposals[proposal_idx]
 
@@ -149,19 +146,11 @@ def cast_ballot(proposal_idx: int, choice_idx: int):
     assert choice_idx >= 0 and choice_idx < len(Proposals[proposal_idx]["choices"]), 'you must select a valid choice.'
     assert now < Proposals[proposal_idx]["date_decision"], 'It is too late to cast a ballot for this proposal.'
     assert Ballots[proposal_idx,"backwards_index", voter] is False, 'you have already cast a ballot !'
-    token_contract_name = metadata['token_contract']
-    
-    if LPWeight[proposal_idx,token_contract_name] is 0:
-         set_lp_token_value(proposal_idx=proposal_idx, token_contract_name=token_contract_name)
     
     '''record ballot'''
     Ballots[proposal_idx,"forwards_index",ballot_idx,"choice"] = choice_idx
     Ballots[proposal_idx,"forwards_index",ballot_idx,"user_vk"] = voter
     Ballots[proposal_idx,"backwards_index", voter] = ballot_idx
-
-    '''record accumulating weight for proposal choices'''
-    current_weight = get_vk_weight(vk=voter, proposal_idx=proposal_idx)    
-    CastChoiceWeight[proposal_idx, choice_idx] += current_weight
     
     BallotCount[proposal_idx] += 1
 
