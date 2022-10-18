@@ -44,6 +44,13 @@ def create_proposal(title:str, description: str, date_decision: datetime.datetim
         "choices": choices,
         "state": "open"
     }
+
+    proposal_idx = ProposalCount.get()
+    
+    token_contract_name = metadata['token_contract']
+    if LPWeight[proposal_idx,token_contract_name] is 0:
+         set_lp_token_value(proposal_idx=proposal_idx, token_contract_name=token_contract_name)
+    
     
 
 def deduct_fee():
@@ -60,9 +67,6 @@ def count_ballots(proposal_idx: int, batch_size: int = None):
     assert Proposals[proposal_idx]["state"] is not "concluded", 'The ballots for this proposal have already been counted'
     assert Ballots[proposal_idx, "counted"] is not True, 'this ballot has been counted.'
     '''check if this proposal has a stored lp token weight, if no, calculate how much the LP weight is worth'''
-    token_contract_name = metadata['token_contract']
-    if LPWeight[proposal_idx,token_contract_name] is 0:
-         set_lp_token_value(proposal_idx=proposal_idx, token_contract_name=token_contract_name)
     
     start_idx = ProcessedBallots[proposal_idx]
     start_idx += 1
