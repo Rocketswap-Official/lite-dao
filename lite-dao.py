@@ -49,7 +49,7 @@ def create_proposal(title:str, description: str, date_decision: datetime.datetim
     
     token_contract_name = metadata['token_contract']
     if LPWeight[proposal_idx,token_contract_name] is 0:
-         set_lp_token_value(proposal_idx=proposal_idx, token_contract_name=token_contract_name)
+        set_lp_token_value(proposal_idx=proposal_idx, token_contract_name=token_contract_name)
     
     
 
