@@ -23,9 +23,6 @@ class MyTestCase(unittest.TestCase):
             code = f.read()
             self.c.submit(code, name="con_staking_rswp_rswp_interop_v2")
 
-        # self.contract_single_asset = self.c.get_contract(
-        #     "con_staking_rswp_rswp_interop_v2"
-        # )
 
         self.contract_single_asset = self.c.get_contract("con_staking_rswp_rswp_interop_v2")
 
@@ -41,7 +38,6 @@ class MyTestCase(unittest.TestCase):
             code = f.read()
             self.c.submit(code, name="con_liq_mining_rswp_rswp")
 
-        #self.yield_farm = self.c.get_contract("con_liq_mining_rswp_rswp")
         self.yield_farm = self.c.get_contract("con_liq_mining_rswp_rswp")
 
 
@@ -188,8 +184,21 @@ class MyTestCase(unittest.TestCase):
 
         self.assertEqual(len(choices), 3)
 
+    def test_03_choices_number_above_max_created_should_fail(self):
+        start_env = {"now": Datetime(year=2022, month=2, day=1)}
 
-    def test_03_fee_deducted_should_pass(self):
+        choices =[
+            'choice one is the choicest', 
+            'choice two is the choosiest', 
+            'choice three is for the thriceiest',
+            'choice four is for the fourthiest',
+            'choice five is for the fifthiest'
+        ]
+        # create proposal
+        with self.assertRaises(AssertionError):
+            self.lite_dao.create_proposal(environment=start_env, signer="bob", title="hello world!", description="describe the world, before it's too late :(", date_decision=Datetime(year=2022, month=3, day=1, hour=1, minute=1), choices=choices)
+
+    def test_04_fee_deducted_should_pass(self):
         start_env = {"now": Datetime(year=2022, month=2, day=1)}
 
         fee_amount = self.lite_dao.metadata["fee_amount"]
@@ -201,7 +210,7 @@ class MyTestCase(unittest.TestCase):
 
         self.assertEqual(fee_amount, difference)
 
-    def test_04_cast_ballot_should_pass(self):
+    def test_05_cast_ballot_should_pass(self):
         env_0 = {"now": Datetime(year=2022, month=2, day=1)}
         # create proposal
         self.lite_dao.create_proposal(environment=env_0, signer="bob", title="hello world!", description="describe the world, before it's too late :(", date_decision=Datetime(year=2022, month=3, day=1, hour=1, minute=1), choices=['choice one is the choicest', 'choice two is the choosiest', 'choice three is for the thriceiest'])
@@ -216,7 +225,7 @@ class MyTestCase(unittest.TestCase):
         
         self.assertEqual(ballot_vk, "bob")
 
-    def test_05_choice_idx_less_than_zero_should_fail(self):
+    def test_06_choice_idx_less_than_zero_should_fail(self):
         env_0 = {"now": Datetime(year=2022, month=2, day=1)}
         # create proposal
         self.lite_dao.create_proposal(environment=env_0, signer="bob", title="hello world!", description="describe the world, before it's too late :(", date_decision=Datetime(year=2022, month=3, day=1, hour=1, minute=1), choices=['choice one is the choicest', 'choice two is the choosiest', 'choice three is for the thriceiest'])
@@ -226,7 +235,7 @@ class MyTestCase(unittest.TestCase):
         with self.assertRaises(AssertionError):
             self.lite_dao.cast_ballot(environment=env_1, signer="bob", proposal_idx=1, choice_idx=-2)
 
-    def test_06_cast_ballot_increments_ballot_count(self):
+    def test_07_cast_ballot_increments_ballot_count(self):
         env_0 = {"now": Datetime(year=2022, month=2, day=1)}
         # create proposal
         self.lite_dao.create_proposal(environment=env_0, signer="bob", title="hello world!", description="describe the world, before it's too late :(", date_decision=Datetime(year=2022, month=3, day=1, hour=1, minute=1), choices=['choice one is the choicest', 'choice two is the choosiest', 'choice three is for the thriceiest'])
@@ -242,7 +251,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(ballot_vk, "bob")
         self.assertEqual(ballot_backwards_idx, 1)
 
-    def test_07_cast_ballot_after_decision_date_should_fail(self):
+    def test_08_cast_ballot_after_decision_date_should_fail(self):
         env_0 = {"now": Datetime(year=2022, month=2, day=1)}
         # create proposal
         self.lite_dao.create_proposal(environment=env_0, signer="bob", title="hello world!", description="describe the world, before it's too late :(", date_decision=Datetime(year=2022, month=3, day=1, hour=1, minute=1), choices=['choice one is the choicest', 'choice two is the choosiest', 'choice three is for the thriceiest'])
@@ -252,7 +261,7 @@ class MyTestCase(unittest.TestCase):
         with self.assertRaises(AssertionError):
             self.lite_dao.cast_ballot(environment=env_1, signer="jane", proposal_idx=1, choice_idx=1)
 
-    def test_08_cast_two_ballots_should_fail(self):
+    def test_09_cast_two_ballots_should_fail(self):
         env_0 = {"now": Datetime(year=2022, month=2, day=1)}
         # create proposal
         self.lite_dao.create_proposal(environment=env_0, signer="bob", title="hello world!", description="describe the world, before it's too late :(", date_decision=Datetime(year=2022, month=3, day=1, hour=1, minute=1), choices=['choice one is the choicest', 'choice two is the choosiest', 'choice three is for the thriceiest'])
@@ -265,7 +274,7 @@ class MyTestCase(unittest.TestCase):
         with self.assertRaises(AssertionError):
             self.lite_dao.cast_ballot(environment=env_2, signer="bob", proposal_idx=1, choice_idx=1)
         
-    def test_09_get_vk_weight_value_passes(self):
+    def test_10_get_vk_weight_value_passes(self):
         env_0 = {"now": Datetime(year=2022, month=2, day=1)}
         # create proposal
         self.lite_dao.create_proposal(environment=env_0, signer="bob", title="hello world!", description="describe the world, before it's too late :(", date_decision=Datetime(year=2022, month=3, day=1, hour=1, minute=1), choices=['choice one is the choicest', 'choice two is the choosiest', 'choice three is for the thriceiest'])
@@ -289,7 +298,7 @@ class MyTestCase(unittest.TestCase):
         
         self.assertEqual(vk_weight, total_vk_weight)
 
-    def test_10_counting_ballots_should_pass(self):
+    def test_11_counting_ballots_should_pass(self):
         env_0 = {"now": Datetime(year=2022, month=2, day=1)}
         # create proposal
         self.lite_dao.create_proposal(environment=env_0, signer="bob", title="hello world!", description="describe the world, before it's too late :(", date_decision=Datetime(year=2022, month=3, day=1, hour=1, minute=1), choices=['choice one is the choicest', 'choice two is the choosiest', 'choice three is for the thriceiest'])
@@ -312,7 +321,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(self.lite_dao.BallotCount[1], ballot_count)
         self.assertEqual(self.lite_dao.Ballots[1, "counted"], counted)    
 
-    def test_11_counting_ballots_in_batches_should_pass(self):
+    def test_12_counting_ballots_in_batches_should_pass(self):
         env_0 = {"now": Datetime(year=2022, month=2, day=1)}
         # create proposal
         self.lite_dao.create_proposal(environment=env_0, signer="bob", title="hello world!", description="describe the world, before it's too late :(", date_decision=Datetime(year=2022, month=3, day=1, hour=1, minute=1), choices=['choice one is the choicest', 'choice two is the choosiest', 'choice three is for the thriceiest'])
@@ -341,7 +350,7 @@ class MyTestCase(unittest.TestCase):
         self.lite_dao.count_ballots(environment=env_2, proposal_idx=1, batch_size=4)
         self.assertEqual(self.lite_dao.ProcessedBallots[1], second_batch_last_ballot_idx)
         
-    def test_12_processed_ballots_should_equal_ballot_count_after_counting_pass(self):
+    def test_13_processed_ballots_should_equal_ballot_count_after_counting_pass(self):
         env_0 = {"now": Datetime(year=2022, month=2, day=1)}
         # create proposal
         self.lite_dao.create_proposal(environment=env_0, signer="bob", title="hello world!", description="describe the world, before it's too late :(", date_decision=Datetime(year=2022, month=3, day=1, hour=1, minute=1), choices=['choice one is the choicest', 'choice two is the choosiest', 'choice three is for the thriceiest'])
@@ -363,7 +372,7 @@ class MyTestCase(unittest.TestCase):
 
         self.assertEqual(ballot_count, processed_ballots_count)
     
-    def test_13_verifying_ballots_should_pass(self):
+    def test_14_verifying_ballots_should_pass(self):
         env_0 = {"now": Datetime(year=2022, month=2, day=1)}
         # create proposal
         self.lite_dao.create_proposal(environment=env_0, signer="bob", title="hello world!", description="describe the world, before it's too late :(", date_decision=Datetime(year=2022, month=3, day=1, hour=1, minute=1), choices=['choice one is the choicest', 'choice two is the choosiest', 'choice three is for the thriceiest'])
@@ -396,7 +405,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(self.lite_dao.VerifiedBallots[1, 1], weight_of_choice_1)
         self.assertEqual(self.lite_dao.VerifiedBallots[1, 2], weight_of_choice_2)
     
-    def test_14_verified_ballots_should_equal_ballot_count_after_verifying_pass(self):
+    def test_15_verified_ballots_should_equal_ballot_count_after_verifying_pass(self):
         env_0 = {"now": Datetime(year=2022, month=2, day=1)}
         # create proposal
         self.lite_dao.create_proposal(environment=env_0, signer="bob", title="hello world!", description="describe the world, before it's too late :(", date_decision=Datetime(year=2022, month=3, day=1, hour=1, minute=1), choices=['choice one is the choicest', 'choice two is the choosiest', 'choice three is for the thriceiest'])
@@ -421,7 +430,7 @@ class MyTestCase(unittest.TestCase):
 
         self.assertEqual(ballot_count, processed_ballots_count)
     
-    def test_15_more_than_5_perc_change_in_voting_weight_should_not_count(self):
+    def test_16_more_than_5_perc_change_in_voting_weight_should_not_count(self):
         env_0 = {"now": Datetime(year=2022, month=2, day=1)}
         # create proposal
         self.lite_dao.create_proposal(environment=env_0, signer="bob", title="hello world!", description="describe the world, before it's too late :(", date_decision=Datetime(year=2022, month=3, day=1, hour=1, minute=1), choices=['choice one is the choicest', 'choice two is the choosiest', 'choice three is for the thriceiest'])
