@@ -19,7 +19,9 @@ def seed():
     metadata['lp_v_token_contracts'] = ['con_liq_mining_rswp_rswp']
     metadata['dex_contract'] = 'con_rocketswap_official_v1_1'
     metadata['min_description_length'] = 10
+    metadata['max_choices_number'] = 4
     metadata['min_title_length'] = 10
+    
 
     ProposalCount.set(0)
 
@@ -29,7 +31,7 @@ def create_proposal(title:str, description: str, date_decision: datetime.datetim
     assert len(title) > metadata['min_title_length'], 'Title must be more than 10 characters long.'
     assert len(description) > metadata['min_description_length'], 'Description length must be more than 100 characters long.'
     assert date_decision > now,    'the decision date must take place in the future.'
-    assert len(choices) > 1, 'you must specify at least 2 choices.'
+    assert len(choices) > 1 and len(choices) <= metadata['max_choices_number'] , f"you must specify at least 2 choices and at most {metadata['max_choices_number']} choices"
 
     for choice in choices:
         assert len(choice) > 0, 'choice cannot be an empty string.'
