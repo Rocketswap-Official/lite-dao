@@ -128,6 +128,7 @@ def verify_ballots(proposal_idx: int, batch_size: int = None):
             Ballots[proposal_idx, "verified"] = True
             Proposals[proposal_idx]["state"] = "concluded"
             Proposals[proposal_idx]["results"] = {}
+            Proposals[proposal_idx] = Proposals[proposal_idx]
 
             for c in range(0, choices_len):
                 Proposals[proposal_idx]["results"][str(c)] = VerifiedBallots[proposal_idx, c]
