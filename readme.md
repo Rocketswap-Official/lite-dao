@@ -16,12 +16,12 @@
 #### fn: count_ballots
 * After `date_decision` no more ballots can be cast and `count_ballots` can be called. * `count_ballots` iterates through all cast ballots, calculates the weight for each ballot and records the value in `CountedBallots`. 
 * `count_ballots` can be called until all ballots have been processed.
-* Since the application counts the ballots in batches, there is a edge case where a savvy adversary could cause mischief and potentially vote with their coins more than once, by moving coins front one address to another in between batches. 
+* Since the application counts the ballots in batches, there is a edge case where a savvy adversary could cause mischief and potentially vote with their coins more than once, by moving coins from one address to another in between batches. 
 * For this reason we have included in a verification step which assures that tokens which are used to vote cannot be used to vote a second time.
 * Once `count_ballots` has been called for a proposal and has counted all the ballots `verify_ballots` can be called.
 
 #### fn: verify_ballots
 
-* Can be called one `count_ballots` has concluded
+* Can be called once `count_ballots` has concluded
 * ensures that the token balances in accounts have not changed dramatically since being counted.
 * to be called in batches, once all ballots have been verified the Proposal is marked as `concluded` and the results are considered final.
