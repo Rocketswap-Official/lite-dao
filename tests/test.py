@@ -433,7 +433,11 @@ class MyTestCase(unittest.TestCase):
     def test_16_more_than_5_perc_change_in_voting_weight_should_not_count(self):
         env_0 = {"now": Datetime(year=2022, month=2, day=1)}
         # create proposal
-        self.lite_dao.create_proposal(environment=env_0, signer="bob", title="hello world!", description="describe the world, before it's too late :(", date_decision=Datetime(year=2022, month=3, day=1, hour=1, minute=1), choices=['choice one is the choicest', 'choice two is the choosiest', 'choice three is for the thriceiest'])
+        self.lite_dao.create_proposal(
+            environment=env_0, signer="bob", title="hello world!", 
+            description="describe the world, before it's too late :(", 
+            date_decision=Datetime(year=2022, month=3, day=1, hour=1, minute=1), 
+            choices=['choice one is the choicest', 'choice two is the choosiest', 'choice three is for the thriceiest'])
 
         env_1 = {"now": Datetime(year=2022, month=2, day=2)}
 
@@ -464,7 +468,7 @@ class MyTestCase(unittest.TestCase):
         
         # bob transfers tokens to day
         env_4 = {"now": Datetime(year=2022, month=3, day=2, hour=1, minute=5)}
-        self.rswp.transfer(environment=env_4, signer="bob", to="day", amount=49637)
+        self.rswp.transfer(environment=env_4, signer="bob", to="day", amount=50217)
         
         env_5 = {"now": Datetime(year=2022, month=3, day=2, hour=1, minute=10)}
         # count second batch
@@ -486,7 +490,6 @@ class MyTestCase(unittest.TestCase):
         weight_of_choice_0 = weight_of_bob + weight_of_mel - weight_of_bob # bob's weight is not counted
         weight_of_choice_1 += weight_of_zen + weight_of_roon 
         weight_of_choice_2 += weight_of_day # weight increases due to bob's transfer to day
-        
         self.assertEqual(self.lite_dao.VerifiedBallots[1, 0], weight_of_choice_0)
         self.assertEqual(self.lite_dao.VerifiedBallots[1, 1], weight_of_choice_1)
         self.assertEqual(self.lite_dao.VerifiedBallots[1, 2], weight_of_choice_2)
