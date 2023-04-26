@@ -13,7 +13,7 @@ I = importlib
 def seed():
     metadata['operator'] = ctx.caller
     metadata['fee_currency'] = 'con_rswp_lst001'
-    metadata['fee_amount'] = 27272 # $30 3/7/22
+    metadata['fee_amount'] = 50 # 27272 $30 3/7/22
     metadata['token_contract'] = 'con_rswp_lst001'
     metadata['v_token_contracts'] = ['con_staking_rswp_rswp_interop_v2']
     metadata['lp_v_token_contracts'] = ['con_liq_mining_rswp_rswp']
@@ -69,7 +69,7 @@ def count_ballots(proposal_idx: int, batch_size: int = None):
     assert Proposals[proposal_idx]["state"] is not "concluded", 'The ballots for this proposal have already been counted'
     assert Ballots[proposal_idx, "counted"] is not True, 'this ballot has been counted.'
     '''check if this proposal has a stored lp token weight, if no, calculate how much the LP weight is worth'''
-    
+
     start_idx = ProcessedBallots[proposal_idx]
     start_idx += 1
 
@@ -126,14 +126,13 @@ def verify_ballots(proposal_idx: int, batch_size: int = None):
 
             choices_len = len(Proposals[proposal_idx]["choices"])
             Ballots[proposal_idx, "verified"] = True
-            Proposals[proposal_idx]["state"] = "concluded"
-            Proposals[proposal_idx]["results"] = {}
-            Proposals[proposal_idx] = Proposals[proposal_idx]
+            Proposal = Proposals[proposal_idx]
+            Proposal["state"] = "concluded"
 
             for c in range(0, choices_len):
-                Proposals[proposal_idx]["results"][str(c)] = VerifiedBallots[proposal_idx, c]
+                Proposal["results"][str(c)] = VerifiedBallots[proposal_idx, c]
                
-            Proposals[proposal_idx] = Proposals[proposal_idx]
+            Proposals[proposal_idx] =  Proposal
 
             VerifiedBallots[proposal_idx] = current_ballot_idx 
 
@@ -180,7 +179,7 @@ def get_vk_weight(vk:str, proposal_idx: int):
 @export
 def get_token_value(vk:str, token_contract_name:str):
     balances = ForeignHash(foreign_contract=token_contract_name, foreign_name='balances')
-    token_balance = balances[vk] 
+    token_balance = balances[vk] or 0
 
     return token_balance
 
@@ -192,7 +191,7 @@ def get_staked_token_value(vk: str):
 
     for contract in staking_contract_names:
         balances = ForeignHash(foreign_contract=contract, foreign_name='balances')
-        vk_balance += balances[vk] 
+        vk_balance += balances[vk] or 0
 
     return vk_balance
 
