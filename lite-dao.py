@@ -44,7 +44,8 @@ def create_proposal(title:str, description: str, date_decision: datetime.datetim
         "description": description,
         "date_decision": date_decision,
         "choices": choices,
-        "state": "open"
+        "state": "open",
+        "results": {}
     }
 
     proposal_idx = ProposalCount.get()
