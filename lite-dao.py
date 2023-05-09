@@ -22,7 +22,6 @@ def seed():
     metadata['max_choices_number'] = 4
     metadata['max_title_length'] = 20
     
-
     ProposalCount.set(0)
 
 
@@ -51,7 +50,7 @@ def create_proposal(title:str, description: str, date_decision: datetime.datetim
     proposal_idx = ProposalCount.get()
     
     token_contract_name = metadata['token_contract']
-    if LPWeight[proposal_idx,token_contract_name] is 0:
+    if LPWeight[proposal_idx,token_contract_name] == 0:
         set_lp_token_value(proposal_idx=proposal_idx, token_contract_name=token_contract_name)
     
     
@@ -62,13 +61,13 @@ def deduct_fee():
     
 
 @export 
-def count_ballots(proposal_idx: int, batch_size: int = None):
-    if batch_size is None: batch_size=100
+def count_ballots(proposal_idx: int, batch_size: int = 0):
+    if batch_size == 0: batch_size=100
 
     '''checks'''
     assert now > Proposals[proposal_idx]["date_decision"], 'It is not possible to count the ballots for this proposal yet'
-    assert Proposals[proposal_idx]["state"] is not "concluded", 'The ballots for this proposal have already been counted'
-    assert Ballots[proposal_idx, "counted"] is not True, 'this ballot has been counted.'
+    assert Proposals[proposal_idx]["state"] != "concluded", 'The ballots for this proposal have already been counted'
+    assert Ballots[proposal_idx, "counted"] != True, 'this ballot has been counted.'
     '''check if this proposal has a stored lp token weight, if no, calculate how much the LP weight is worth'''
 
     start_idx = ProcessedBallots[proposal_idx]
@@ -102,9 +101,9 @@ def verify_ballots(proposal_idx: int, batch_size: int = None):
     if batch_size is None: batch_size=100
 
     '''checks'''
-    assert Ballots[proposal_idx, "counted"] is True, 'ballots must be counted before verifying them'
-    assert Ballots[proposal_idx, "verified"] is not True, 'the ballots for this proposal have already been verified'
-    assert Proposals[proposal_idx]["state"] is not "concluded", 'this proposal has been concluded'
+    assert Ballots[proposal_idx, "counted"] == True, 'ballots must be counted before verifying them'
+    assert Ballots[proposal_idx, "verified"] != True, 'the ballots for this proposal have already been verified'
+    assert Proposals[proposal_idx]["state"] != "concluded", 'this proposal has been concluded'
 
     start_idx = VerifiedBallots[proposal_idx]
     start_idx += 1
@@ -149,10 +148,10 @@ def cast_ballot(proposal_idx: int, choice_idx: int):
     ballot_idx += 1
     
     '''checks'''
-    assert Proposals[proposal_idx] is not False
+    assert Proposals[proposal_idx] != False
     assert choice_idx >= 0 and choice_idx < len(Proposals[proposal_idx]["choices"]), 'you must select a valid choice.'
     assert now < Proposals[proposal_idx]["date_decision"], 'It is too late to cast a ballot for this proposal.'
-    assert Ballots[proposal_idx,"backwards_index", voter] is False, 'you have already cast a ballot !'
+    assert Ballots[proposal_idx,"backwards_index", voter] == False, 'you have already cast a ballot !'
     
     '''record ballot'''
     Ballots[proposal_idx,"forwards_index",ballot_idx,"choice"] = choice_idx
