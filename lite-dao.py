@@ -61,8 +61,8 @@ def deduct_fee():
     
 
 @export 
-def count_ballots(proposal_idx: int, batch_size: int = 0):
-    if batch_size == 0: batch_size=100
+def count_ballots(proposal_idx: int, batch_size: int = None):
+    if batch_size == None: batch_size=100
 
     '''checks'''
     assert now > Proposals[proposal_idx]["date_decision"], 'It is not possible to count the ballots for this proposal yet'
@@ -98,7 +98,7 @@ def count_ballots(proposal_idx: int, batch_size: int = 0):
 
 @export 
 def verify_ballots(proposal_idx: int, batch_size: int = None):
-    if batch_size is None: batch_size=100
+    if batch_size == None: batch_size=100
 
     '''checks'''
     assert Ballots[proposal_idx, "counted"] == True, 'ballots must be counted before verifying them'
